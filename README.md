@@ -1,5 +1,9 @@
 # Stress-Detection
 
+### Overview
+This project explores whether stress levels can be quantitatively predicted using only self-reported survey data, without expensive wearable devices or physiological sensors.
+Using survey responses from undergraduate students at Korea University (Sejong Campus), we build and evaluate machine learning models to predict perceived stress scores.
+
 ## Analysis Workflow
 1. Preprocessing
 2. Exploratory Data Analysis
@@ -8,10 +12,6 @@
 5. Principal Component Analysis
 6. Modeling
 7. 95% Confidence Interval Visualization
-
-### Overview
-This project explores whether stress levels can be quantitatively predicted using only self-reported survey data, without expensive wearable devices or physiological sensors.
-Using survey responses from undergraduate students at Korea University (Sejong Campus), we build and evaluate machine learning models to predict perceived stress scores.
 
 ### Research Question
 Can we build a reliable AI model that predicts stress levels using only self-reported questionnaire data?
