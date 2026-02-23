@@ -1,0 +1,182 @@
+# Import modules
+import os
+import numpy as np
+import pandas as pd
+
+# Load data
+df = pd.read_csv(r"data.csv", encoding="cp949")
+
+# value from zero to three or four
+data = df._get_numeric_data() - 1
+
+# Labelling
+label_major = {"인문계열": 0,
+              "사회계열": 1,
+              "교육계열": 2,
+              "자연계열": 3,
+              "공학계열": 4,
+              "예체능계열": 5,
+              "의약계열": 6}
+
+data["major"] = df["P3"].map(label_major)
+
+label_sex = {"남성": 0,
+            "여성": 1}
+
+data["sex"] = df["P4"].map(label_sex)
+
+label_grade = {"1학년": 0,
+              "2학년": 1,
+              "3학년": 2,
+              "4학년": 3}
+
+data["grade"] = df["P5"].map(label_grade)
+
+label_recess = {"없음": 0, "있음": 1}
+
+data["recess"] = df["P6"].map(label_recess)
+
+label_diet = {"전혀 먹지 않았다.": 0,
+             "주 1~2회": 1,
+             "주 3~4회": 2,
+             "주 5~6회": 3,
+             "매일 먹었다.": 4}
+
+for i in range(4):
+    data[f"F{i+1}"] = df[f"F{i+1}"].map(label_diet)
+
+label_sleep = {"5시간 미만": 0,
+              "5시간~6시간": 1,
+              "6시간~7시간": 2,
+              "7시간~8시간": 3,
+              "8시간 이상": 4}
+
+data["S1"] = df["S1"].map(label_sleep)
+
+label_PSQI = {"지난 한 달동안 없었다. (없다)": 0,
+              "한 주에 1번보다 적게 있었다. (주 1회 미만)": 1,
+              "한 주에 1~2번 정도 있었다. (주 1~2회)": 2,
+              "한 주에 3번 이상 있었다. (주 3회 이상)": 3}
+
+for i in range(9):
+    data[f"PSQI{i+1}"] = df[f"PSQI{i+1}"].map(label_PSQI)
+
+label_CESD = {"1일 미만": 0,
+              "1~2일": 1,
+              "3~4일": 2,
+              "5~7일": 3}
+
+for i in range(20):
+    data[f"CESD{i+1}"] = df[f"CESD{i+1}"].map(label_CESD)
+
+# reverse scoring
+list_reverse = [
+    "SACQ1",
+    "SACQ2",
+    "SACQ5",
+    "SACQ6",
+    "SACQ10",
+    "SACQ11",
+    "SACQ14",
+    "SACQ19",
+    "SACQ23",
+    "SACQ25",
+    "F1",
+    "F2",
+    "F3",
+    "F4",
+    "S1",
+    "S2",
+    "SHS1",
+    "SHS2",
+    "SWLS1",
+    "SWLS2",
+    "SWLS3",
+    "SWLS4",
+    "SWLS5",
+    "PSS4",
+    "PSS5",
+    "PSS6",
+    "PSS7",
+    "PSS8",
+    ]
+
+for col in list_reverse:
+    data[col] = 4 - data[col]
+
+# user data
+user_secret = df[["P1", "P2"]]
+user_secret.columns = ["name", "phone"]
+user = data[["major", "sex", "grade", "recess"]]
+df.drop(["P1", "P2", "P3", "P4", "P5", "P6"], axis=1, inplace=True)
+
+# columns name list
+list_col_name = df.columns.to_list()
+
+# sorting column names
+data = data.reindex(list_col_name, axis=1)
+data.columns = data.columns.str.lower()
+
+# seperate
+data_sacq = data[[f"sacq{i+1}" for i in range(25)]]
+data_diet = data[[f"f{i+1}" for i in range(4)]]
+data_sleep = data[[f"s{i+1}" for i in range(2)]]
+data_sleep.columns = ["sleep1", "sleep2"]
+data_psqi = data[[f"psqi{i+1}" for i in range(9)]]
+data_cesd = data[[f"cesd{i+1}" for i in range(20)]]
+data_happiness = data[[f"shs{i+1}" for i in range(2)]+[f"swls{i+1}" for i in range(5)]]
+data_pss = data[[f"pss{i+1}" for i in range(10)]]
+
+# sum
+s_data = pd.DataFrame()
+s_data["SACQ"] = data_sacq.sum(axis=1)
+s_data["Diet"] = data_diet.sum(axis=1)
+s_data["Sleep"] = data_sleep.sum(axis=1)
+s_data["PSQI"] = data_psqi.sum(axis=1)
+s_data["CESD"] = data_cesd.sum(axis=1)
+s_data["Happiness"] = data_happiness.sum(axis=1)
+s_data["PSS"] = data_pss.sum(axis=1)
+
+# mean
+m_data = pd.DataFrame()
+m_data["SACQ"] = data_sacq.mean(axis=1)
+m_data["Diet"] = data_diet.mean(axis=1)
+m_data["Sleep"] = data_sleep.mean(axis=1)
+m_data["PSQI"] = data_psqi.mean(axis=1)
+m_data["CESD"] = data_cesd.mean(axis=1)
+m_data["Happiness"] = data_happiness.mean(axis=1)
+m_data["PSS"] = data_pss.mean(axis=1)
+
+# 100
+h_data = pd.concat([data_sacq * 20,
+            data_diet * 20,
+            data_sleep * 20,
+            data_psqi * 25,
+            data_cesd * 25,
+            data_happiness * 20,
+            data_pss * 20], axis=1)
+
+data_sacq *= 20
+data_diet *= 20
+data_sleep *= 20
+data_psqi *= 25
+data_cesd *= 25
+data_happiness *= 20
+data_pss *= 20
+
+
+
+# save csv
+data.to_csv("data_preprocessed.csv", index=None)
+user_secret.to_csv("user_secret.csv", encoding="cp949", index=None)
+user.to_csv("user.csv", index=None)
+data_sacq.to_csv("data_sacq.csv", index=None)
+data_diet.to_csv("data_diet.csv", index=None)
+data_sleep.to_csv("data_sleep.csv", index=None)
+data_psqi.to_csv("data_psqi.csv", index=None)
+data_cesd.to_csv("data_cesd.csv", index=None)
+data_happiness.to_csv("data_happiness.csv", index=None)
+data_pss.to_csv("data_pss.csv", index=None)
+s_data.to_csv("sum_data.csv", index=None)
+m_data.to_csv("mean_data.csv", index=None)
+h_data.to_csv("hundred_data.csv", index=None)
