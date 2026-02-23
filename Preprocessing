@@ -105,10 +105,8 @@ for col in list_reverse:
     data[col] = 4 - data[col]
 
 # user data
-user_secret = df[["P1", "P2"]]
-user_secret.columns = ["name", "phone"]
 user = data[["major", "sex", "grade", "recess"]]
-df.drop(["P1", "P2", "P3", "P4", "P5", "P6"], axis=1, inplace=True)
+df.drop(["P3", "P4", "P5", "P6"], axis=1, inplace=True)
 
 # columns name list
 list_col_name = df.columns.to_list()
@@ -164,11 +162,8 @@ data_cesd *= 25
 data_happiness *= 20
 data_pss *= 20
 
-
-
 # save csv
 data.to_csv("data_preprocessed.csv", index=None)
-user_secret.to_csv("user_secret.csv", encoding="cp949", index=None)
 user.to_csv("user.csv", index=None)
 data_sacq.to_csv("data_sacq.csv", index=None)
 data_diet.to_csv("data_diet.csv", index=None)
