@@ -1,6 +1,6 @@
 # Stress-Detection
 
-## Table of Contents
+## Analysis Workflow
 1. Preprocessing
 2. Exploratory Data Analysis
 3. Statistical Hypothesis Test
